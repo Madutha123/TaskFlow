@@ -127,6 +127,9 @@ body::before {
 }
 
 .app-header__logout {
+  display: inline-flex;  /* Allows the button to wrap its content tightly */
+  align-items: center;   /* Perfectly centers icon and text vertically */
+  gap: 6px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-primary);
@@ -142,6 +145,9 @@ body::before {
   color: var(--accent);
 }
 
+.app-header__logout svg {
+  display: block;
+}
 .app-session-loading {
   min-height: calc(100vh - 52px);
   display: grid;
@@ -182,3 +188,6 @@ body::before {
   background: var(--accent);
   color: var(--bg);
 }
+
+
+/* Ensure the icon doesn't have weird margins */

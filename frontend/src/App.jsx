@@ -11,6 +11,7 @@ import AuthPage from './components/Auth/AuthPage';
 import ToastContainer from './components/common/Toast';
 import useToast from './hooks/useToast';
 import './styles/global.css';
+import { LogOut } from 'lucide-react'
 
 /**
  * Inner app with access to toast hook (must be inside providers)
@@ -33,9 +34,16 @@ const AppInner = () => {
 
         {isAuthenticated && (
           <div className="app-header__auth">
-            <span className="app-header__user">{user?.name || user?.email}</span>
-            <button type="button" className="app-header__logout" onClick={handleLogout}>
-              Logout
+            <span className="app-header__user">
+              {user?.name || user?.email}
+            </span>
+            <button
+              type="button"
+              className="app-header__logout"
+              onClick={handleLogout}
+            >
+              <LogOut size={10} className="logout-icon" />
+              <span>Logout</span>
             </button>
           </div>
         )}
@@ -50,7 +58,11 @@ const AppInner = () => {
           </ErrorBoundary>
         </TaskProvider>
       ) : (
-        <AuthPage onLogin={login} onRegister={register} loading={authActionLoading} />
+        <AuthPage
+          onLogin={login}
+          onRegister={register}
+          loading={authActionLoading}
+        />
       )}
 
       <ToastContainer toasts={toasts} removeToast={removeToast} />
