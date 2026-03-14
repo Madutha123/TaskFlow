@@ -6,6 +6,9 @@ const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
 const { validateCreate, validateUpdate, validateStatus } = require('../middleware/validate');
+const { protect } = require('../middleware/auth');
+
+router.use(protect);
 
 // Stats must come before /:id to avoid being treated as an ID
 router.get('/stats', taskController.getTaskStats);

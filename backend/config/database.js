@@ -4,6 +4,7 @@
  */
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
+const User = require('../models/User');
 
 const MAX_RETRIES = 5;
 const RETRY_DELAY_MS = 5000;
@@ -28,6 +29,11 @@ const connectDatabase = async (attempt = 1) => {
     });
 
     logger.info(`MongoDB connected: ${conn.connection.host} 🔥`);
+
+    // Keep DB indexes aligned with schemas; this removes stale unique indexes
+    // (e.g., an accidentally unique `name` field from previous schema versions).
+    await User.syncIndexes();
+    logger.info('User model indexes synchronized');
 
     mongoose.connection.on('disconnected', () => {
       logger.warn('MongoDB disconnected — attempting reconnect...');

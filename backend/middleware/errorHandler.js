@@ -52,7 +52,13 @@ const errorHandler = (err, req, res, next) => {
   // Default internal server error
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal server error';
-  sendError(res, statusCode, message, process.env.NODE_ENV === 'development' ? err.stack : 'An unexpected error occurred');
+
+  // For client errors (4xx), return a clean detail message instead of stack traces.
+  const errorDetail = statusCode >= 500
+    ? (process.env.NODE_ENV === 'development' ? err.stack : 'An unexpected error occurred')
+    : message;
+
+  sendError(res, statusCode, message, errorDetail);
 };
 
 module.exports = { notFoundHandler, errorHandler };

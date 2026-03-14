@@ -4,7 +4,6 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import useTasks from '../../hooks/useTasks';
-import { useTaskContext } from '../../context/TaskContext';
 import TaskStats from '../TaskStats/TaskStats';
 import TaskFilter from '../TaskFilter/TaskFilter';
 import TaskList from '../TaskList/TaskList';
@@ -17,7 +16,6 @@ import './TaskDashboard.css';
  * @param {{ showToast: Function }} props
  */
 const TaskDashboard = ({ showToast }) => {
-  const { state } = useTaskContext();
   const {
     tasks,
     loading,

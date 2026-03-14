@@ -4,6 +4,11 @@
  */
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+let authToken = null;
+
+export const setAuthToken = (token) => {
+  authToken = token || null;
+};
 
 /**
  * @typedef {object} ApiResponse
@@ -23,8 +28,17 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:500
 const apiFetch = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
 
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  }
+
   const config = {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   };
 
@@ -107,6 +121,15 @@ const deleteTask = (id) => apiFetch(`/tasks/${id}`, { method: 'DELETE' });
  */
 const getStats = () => apiFetch('/tasks/stats');
 
+const register = (payload) =>
+  apiFetch('/auth/register', { method: 'POST', body: JSON.stringify(payload) });
+
+const login = (payload) =>
+  apiFetch('/auth/login', { method: 'POST', body: JSON.stringify(payload) });
+
+const getMe = () => apiFetch('/auth/me');
+
 const taskApi = { getTasks, getTaskById, createTask, updateTask, updateTaskStatus, deleteTask, getStats };
+export const authApi = { register, login, getMe };
 
 export default taskApi;

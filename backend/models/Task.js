@@ -11,6 +11,12 @@ const MAX_TAG_LENGTH = 30;
 
 const taskSchema = new mongoose.Schema(
   {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Task owner is required'],
+      index: true,
+    },
     title: {
       type: String,
       required: [true, 'Title is required'],

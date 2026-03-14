@@ -11,6 +11,7 @@ const morgan = require('morgan');
 
 const { connectDatabase } = require('./config/database');
 const taskRoutes = require('./routes/taskRoutes');
+const authRoutes = require('./routes/authRoutes');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
@@ -67,6 +68,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // ── Routes ──────────────────────────────────────────────────────────────────
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // ── Error Handling ──────────────────────────────────────────────────────────

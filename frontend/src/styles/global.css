@@ -108,6 +108,69 @@ body::before {
   color: var(--text-muted);
 }
 
+.app-header__auth {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.app-header__user {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-header__logout {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 0.35rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.app-header__logout:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.app-session-loading {
+  min-height: calc(100vh - 52px);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    gap: 0.7rem;
+    padding: 0 1rem;
+  }
+
+  .app-header__tagline {
+    display: none;
+  }
+
+  .app-header__auth {
+    gap: 0.45rem;
+  }
+
+  .app-header__user {
+    max-width: 120px;
+  }
+}
+
 /* ── Focus Visible ───────────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--accent);

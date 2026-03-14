@@ -12,7 +12,7 @@ const { sendSuccess } = require('../utils/apiResponse');
  */
 const getTasks = async (req, res, next) => {
   try {
-    const result = await taskService.getAllTasks(req.query);
+    const result = await taskService.getAllTasks(req.query, req.user.id);
     sendSuccess(res, 200, result.tasks, `Found ${result.total} task(s)`, {
       pagination: result.pagination,
     });
@@ -28,7 +28,7 @@ const getTasks = async (req, res, next) => {
  */
 const getTaskById = async (req, res, next) => {
   try {
-    const task = await taskService.getTaskById(req.params.id);
+    const task = await taskService.getTaskById(req.params.id, req.user.id);
     sendSuccess(res, 200, task, 'Task retrieved successfully');
   } catch (error) {
     next(error);
@@ -42,7 +42,7 @@ const getTaskById = async (req, res, next) => {
  */
 const createTask = async (req, res, next) => {
   try {
-    const task = await taskService.createTask(req.body);
+    const task = await taskService.createTask(req.body, req.user.id);
     sendSuccess(res, 201, task, 'Task created successfully');
   } catch (error) {
     next(error);
@@ -56,7 +56,7 @@ const createTask = async (req, res, next) => {
  */
 const updateTask = async (req, res, next) => {
   try {
-    const task = await taskService.updateTask(req.params.id, req.body);
+    const task = await taskService.updateTask(req.params.id, req.body, req.user.id);
     sendSuccess(res, 200, task, 'Task updated successfully');
   } catch (error) {
     next(error);
@@ -70,7 +70,7 @@ const updateTask = async (req, res, next) => {
  */
 const updateTaskStatus = async (req, res, next) => {
   try {
-    const task = await taskService.updateTaskStatus(req.params.id, req.body.status);
+    const task = await taskService.updateTaskStatus(req.params.id, req.body.status, req.user.id);
     sendSuccess(res, 200, task, 'Task status updated successfully');
   } catch (error) {
     next(error);
@@ -84,7 +84,7 @@ const updateTaskStatus = async (req, res, next) => {
  */
 const deleteTask = async (req, res, next) => {
   try {
-    await taskService.deleteTask(req.params.id);
+    await taskService.deleteTask(req.params.id, req.user.id);
     sendSuccess(res, 200, null, 'Task deleted successfully');
   } catch (error) {
     next(error);
@@ -98,7 +98,7 @@ const deleteTask = async (req, res, next) => {
  */
 const getTaskStats = async (req, res, next) => {
   try {
-    const stats = await taskService.getTaskStats();
+    const stats = await taskService.getTaskStats(req.user.id);
     sendSuccess(res, 200, stats, 'Task statistics retrieved');
   } catch (error) {
     next(error);

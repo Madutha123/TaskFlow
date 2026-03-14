@@ -2,6 +2,7 @@
  * @module taskService
  * @description Business logic layer for Task operations
  */
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 
 const PRIORITY_SORT_MAP = { high: 1, medium: 2, low: 3 };
@@ -43,12 +44,12 @@ const buildSort = (sortBy = 'createdAt', order = 'desc') => {
  * @param {string|number} [queryParams.limit=10] - Items per page
  * @returns {Promise<{tasks: object[], total: number, pagination: object}>}
  */
-const getAllTasks = async ({ status, priority, q, sortBy, order, page = 1, limit = 10 }) => {
+const getAllTasks = async ({ status, priority, q, sortBy, order, page = 1, limit = 10 }, userId) => {
   const parsedPage = Math.max(1, parseInt(page, 10) || 1);
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
   const skip = (parsedPage - 1) * parsedLimit;
 
-  const filter = buildFilter({ status, priority, q });
+  const filter = { ...buildFilter({ status, priority, q }), owner: userId };
   const sort = buildSort(sortBy, order);
 
   const [tasks, total] = await Promise.all([
@@ -77,8 +78,8 @@ const getAllTasks = async ({ status, priority, q, sortBy, order, page = 1, limit
  * @returns {Promise<object>} Task document
  * @throws {Error} 404 if not found
  */
-const getTaskById = async (id) => {
-  const task = await Task.findById(id).lean();
+const getTaskById = async (id, userId) => {
+  const task = await Task.findOne({ _id: id, owner: userId }).lean();
   if (!task) {
     const err = new Error('Task not found');
     err.statusCode = 404;
@@ -92,8 +93,8 @@ const getTaskById = async (id) => {
  * @param {object} taskData - Validated task data
  * @returns {Promise<object>} Created task document
  */
-const createTask = async (taskData) => {
-  const task = await Task.create(taskData);
+const createTask = async (taskData, userId) => {
+  const task = await Task.create({ ...taskData, owner: userId });
   return task.toObject();
 };
 
@@ -104,9 +105,9 @@ const createTask = async (taskData) => {
  * @returns {Promise<object>} Updated task document
  * @throws {Error} 404 if not found
  */
-const updateTask = async (id, updateData) => {
-  const task = await Task.findByIdAndUpdate(
-    id,
+const updateTask = async (id, updateData, userId) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: id, owner: userId },
     { $set: updateData },
     { new: true, runValidators: true }
   ).lean();
@@ -127,9 +128,9 @@ const updateTask = async (id, updateData) => {
  * @returns {Promise<object>} Updated task document
  * @throws {Error} 404 if not found
  */
-const updateTaskStatus = async (id, status) => {
-  const task = await Task.findByIdAndUpdate(
-    id,
+const updateTaskStatus = async (id, status, userId) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: id, owner: userId },
     { $set: { status } },
     { new: true, runValidators: true }
   ).lean();
@@ -149,8 +150,8 @@ const updateTaskStatus = async (id, status) => {
  * @returns {Promise<object>} Deleted task document
  * @throws {Error} 404 if not found
  */
-const deleteTask = async (id) => {
-  const task = await Task.findByIdAndDelete(id).lean();
+const deleteTask = async (id, userId) => {
+  const task = await Task.findOneAndDelete({ _id: id, owner: userId }).lean();
   if (!task) {
     const err = new Error('Task not found');
     err.statusCode = 404;
@@ -163,8 +164,15 @@ const deleteTask = async (id) => {
  * Get aggregate statistics for tasks
  * @returns {Promise<object>} Stats object
  */
-const getTaskStats = async () => {
+const getTaskStats = async (userId) => {
+  const ownerId = new mongoose.Types.ObjectId(userId);
+
   const stats = await Task.aggregate([
+    {
+      $match: {
+        owner: ownerId,
+      },
+    },
     {
       $group: {
         _id: '$status',
@@ -174,6 +182,11 @@ const getTaskStats = async () => {
   ]);
 
   const priorityStats = await Task.aggregate([
+    {
+      $match: {
+        owner: ownerId,
+      },
+    },
     {
       $group: {
         _id: '$priority',
